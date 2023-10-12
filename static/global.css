@@ -78,7 +78,4 @@ pre code {
   padding-block-end: 0.75rem;
   line-height: 2.25rem;
   text-align: center;
-
-  @media prefer-color0 {
-  }
 }
