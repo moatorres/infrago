@@ -1,10 +1,17 @@
 package main
 
 import (
+	"fmt"
+
 	"io"
-	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	loggo "github.com/moatorres/go/modules/logger"
+	"github.com/moatorres/go/modules/utils"
 )
 
 // file server
@@ -12,32 +19,47 @@ func FileServerHandler() http.Handler {
 	return http.FileServer(http.Dir("./static"))
 }
 
-// main
-func main() {
-	port := getEnv("PORT", "3000")
-	fs := FileServerHandler()
+// logger instance
+var logger = loggo.New(loggo.LoggerOptions{
+	Service: "infrago",
+})
 
-	log.Printf("Server is running at %s\n", port)
-
-	http.Handle("/", fs)
-	http.HandleFunc("/health", health)
-
-	err := http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// handlers
-func health(w http.ResponseWriter, r *http.Request) {
+// health handler
+func healthz(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "OK")
-	log.Printf(r.Method + " " + r.Host + r.URL.Path)
+	logger.Log(r.Method + " " + r.Host + r.URL.Path)
 }
 
-// utils
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
+// graceful process
+func main() {
+	port := utils.GetEnvVar("PORT", "3000")
+	fileServer := FileServerHandler()
+	serverTimeout := 10
+
+	http.Handle("/", fileServer)
+	http.HandleFunc("/healthz", healthz)
+
+	signalsChannel := make(chan os.Signal, 1)
+	watchedSignals := []os.Signal{os.Interrupt, syscall.SIGTERM, syscall.SIGINT}
+	signal.Notify(signalsChannel, watchedSignals...)
+
+	go func() {
+		logger.Log("Server is running at %s", port)
+		err := http.ListenAndServe(":"+port, nil)
+		if err != nil {
+			logger.Fatal(err)
+		}
+	}()
+
+	sig := <-signalsChannel
+
+	logger.Warn("Caught signal '%v'", sig)
+
+	logger.Log("Server will shut down in %s seconds", fmt.Sprint(serverTimeout))
+
+	time.Sleep(time.Second * time.Duration(serverTimeout))
+
+	logger.Log("Bye 👋")
+
+	os.Exit(0)
 }
