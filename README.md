@@ -1,12 +1,10 @@
-# Infrago
+# InfraGo
 
-### A Static `FileServer` example application written in Go
+### An Open-Source Static FileServer Written in Go
 
 Infrago is an open-source static file server application based on the native `net/http` module. This project was created as an exercise and should serve as a simple example of what you can build with [Go](https://go.dev/), [Docker](https://www.docker.com/) and [Kubernetes](https://kubernetes.io/).
 
-
 https://github.com/moatorres/infrago/assets/44585769/8109d758-6215-48a6-b888-d1c1cec94a9b
-
 
 ## Build
 
@@ -36,18 +34,35 @@ make build
 
 ## Deploy
 
-<sub>This project is skaffold-friendly ✨ If you don't want to install `skaffold` on your machine, you can deploy the resources as you'd normally do with `kubectl`. Learn more about Skaffold [here](https://skaffold.dev/). </sub>
+You can deploy the resources as you'd normally do with `kubectl`.
 
 **Deploying with `kubectl`**
 
 ```sh
-kubectl apply -f k8s/dev/*.yaml
+kubectl apply -f k8s/dev/deployment.yaml
+kubectl apply -f k8s/dev/ingress.yaml
 ```
 
 **Deploying with `make`**
 
 ```sh
 make deploy-dev
+```
+
+#### This is a `skaffold` friendly project
+
+Skaffold handles the workflow for building, pushing and deploying your application, allowing you to focus on what matters most: writing code. ✨ Learn more about Skaffold [here](https://skaffold.dev/).
+
+**Installing `skaffold` on your machine**
+
+```sh
+# For Linux x86_64 (amd64)
+curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && \
+sudo install skaffold /usr/local/bin/
+
+# For Linux ARMv8 (arm64)
+curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-arm64 && \
+sudo install skaffold /usr/local/bin/
 ```
 
 **Deploying with `skaffold`**
@@ -58,11 +73,11 @@ skaffold dev
 
 ## Graceful Shutdown
 
-Let's see how our deployment behaves on Kubernetes. It's advised that you install `skaffold`. Skaffold spins resources up and down without requiring shell scripts. ✨
+Let's see how our deployment behaves on Kubernetes. It's advised that you install `skaffold`. Skaffold handles the workflow for building, pushing and deploying your application, allowing you to focus on what matters most: writing code. ✨
 
 1. Open **three** terminals on your machine then run `skaffold dev` in the first one.
 2. Run `kubectl get pods` to get the names of the running pods.
-3. Now run `kubeclt logs -f pods/infrago-7f5dbb59cf-dvx8g` (remember to replace the pod name with yours). This will allow us to follow our pod's logs.
+3. Now run `kubectl logs -f pods/infrago-7f5dbb59cf-dvx8g` (remember to replace the pod name with yours). This will allow us to follow our pod's logs.
 4. Go to the third terminal and run `kubectl get pods infrago-7f5dbb59cf-dvx8g -w` to watch the pod's state.
 5. Now go back to the first terminal and press `ctrl c` to stop the `skaffold` process.
 

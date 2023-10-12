@@ -63,17 +63,17 @@ logger.Warn("Crossing 🚸")
 
 ```go
 var logger = New(LoggerOptions{
-	Service: "error-monkey",
+	Service: "chaos-monkey",
 })
 
-type MyError struct{}
+type MonkeyError struct{}
 
-func (m *MyError) Error() string {
-	return "Boom 💥"
+func (m *MonkeyError) Error() string {
+	return "Boom 🙉 💥"
 }
 
 func chaos() (string, error) {
-	return "", &MyError{}
+	return "", &MonkeyError{}
 }
 
 func unleash() {
@@ -85,7 +85,7 @@ func unleash() {
 }
 
 unleash()
-// → {"service":"error-monkey","level":"ERROR","message":"Boom 💥","timestamp":"2023-10-12T10:20:47-03:00"}
+// → {"service":"chaos-monkey","level":"ERROR","message":"Boom 🙉 💥","timestamp":"2023-10-12T10:20:47-03:00"}
 ```
 
 ### `logger.Debug`
@@ -94,13 +94,13 @@ unleash()
 
 ```go
 var logger = loggo.New(loggo.LoggerOptions{
-  Service: "usual-day",
+  Service: "bug-nest",
 })
 
-var bug := "F*** 🤬"
+var bug := "🐛🐞🪲"
 
 logger.Debug("What's going on here? %s", bug)
-// → {"service":"usual-day","level":"DEBUG","message":"What's going on here? F*** 🤬","timestamp":"2023-10-12T10:20:47-03:00"}
+// → {"service":"bug-nest","level":"DEBUG","message":"What's going on here? 🐛🐞🪲","timestamp":"2023-10-12T10:20:47-03:00"}
 ```
 
 ### `logger.Fatal`
@@ -121,7 +121,7 @@ logger.Fatal("Uhoh 💀")
 
 - [ ] Disable `LogLevel` colors
 - [ ] Customize `LogLevel` colors
-- [ ] Set `LogLevel` via environment varibale
+- [ ] Set `LogLevel` via environment variable
 - [ ] Edit `LogMessage` properties
 
 <sub>⚡️ Powered by **OSS** — `< >` with ☕️ by [**Moa Torres**](https://github.com/moatorres)</sub>
