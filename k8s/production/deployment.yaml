@@ -2,12 +2,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: infrago-rotational
-  # namespace: localdev
+  name: infrago
 spec:
   selector:
     matchLabels:
-      app: infrago-rotational
+      app: infrago
   replicas: 2
   strategy:
     rollingUpdate:
@@ -16,7 +15,7 @@ spec:
   template:
     metadata:
       labels:
-        app: infrago-rotational
+        app: infrago
     spec:
       affinity:
         podAntiAffinity:
@@ -26,7 +25,7 @@ spec:
                   - key: app
                     operator: In
                     values:
-                      - infrago-rotational
+                      - infrago
               topologyKey: 'kubernetes.io/hostname'
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 100
@@ -36,8 +35,8 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - infrago-rotational
-                topologyKey: 'topology.kubernetes.io/zone' # for AZs
+                        - infrago
+                topologyKey: 'topology.kubernetes.io/zone' # between diff AZs
             - weight: 50
               podAffinityTerm:
                 labelSelector:
@@ -45,12 +44,12 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - infrago-rotational
-                topologyKey: 'kubernetes.io/hostname' # for nodes
+                        - infrago
+                topologyKey: 'kubernetes.io/hostname' # between diff nodes
       terminationGracePeriodSeconds: 120
       containers:
-        - name: infrago-rotational
-          image: docker.io/moatorres/infrago-rotational
+        - name: infrago
+          image: docker.io/moatorres/infrago
           imagePullPolicy: IfNotPresent
           env:
             - name: 'PORT'
@@ -67,19 +66,19 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ['/bin/sh', '-c', 'echo infrago-rotational started']
+                command: ['/bin/sh', '-c', 'echo infrago started']
             preStop:
               exec:
-                command: ['/bin/sh', '-c', 'echo infrago-rotational stopped']
+                command: ['/bin/sh', '-c', 'echo infrago stopped']
           readinessProbe:
             httpGet:
               port: 3000
-              path: /health
+              path: /healthz
             initialDelaySeconds: 5
             periodSeconds: 5
           livenessProbe:
             httpGet:
-              path: /health
+              path: /healthz
               port: 3000
             initialDelaySeconds: 3
             periodSeconds: 3
@@ -88,30 +87,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: infrago-rotational
+  name: infrago
 spec:
   selector:
-    app: infrago-rotational
+    app: infrago
   type: NodePort
   ports:
     - port: 80
       targetPort: 3000
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: infrago-rotational-ingress
-  labels:
-    name: infrago-rotational-ingress
-spec:
-  ingressClassName: 'gce'
-  rules:
-    - http:
-        paths:
-          - pathType: ImplementationSpecific
-            path: '/'
-            backend:
-              service:
-                name: infrago-rotational
-                port:
-                  number: 3000

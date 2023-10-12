@@ -1,0 +1,19 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: infrago-ingress
+  labels:
+    name: infrago-ingress
+spec:
+  ingressClassName: 'gce'
+  rules:
+    - http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: '/'
+            backend:
+              service:
+                name: infrago
+                port:
+                  number: 3000
