@@ -1,0 +1,19 @@
+---
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: images
+build:
+  local:
+    push: false
+    concurrency: 3
+    useBuildkit: true
+  artifacts:
+    - image: docker.io/moatorres/infrago
+      sync:
+        infer: ['**/*']
+deploy:
+  kubectl: {}
+manifests:
+  rawYaml:
+    - k8s/dev/*.yaml
