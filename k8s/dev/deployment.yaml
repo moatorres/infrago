@@ -21,7 +21,7 @@ spec:
       containers:
         - name: infrago
           image: docker.io/moatorres/infrago:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: 'PORT'
               value: '3000'
