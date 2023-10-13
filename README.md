@@ -2,7 +2,7 @@
 
 ### An Open-Source Static FileServer Written in Go
 
-Infrago is an open-source static file server application based on the native `net/http` module. This project was created as an exercise and should serve as a simple example of what you can build with [Go](https://go.dev/), [Docker](https://www.docker.com/) and [Kubernetes](https://kubernetes.io/).
+InfraGo is an open-source static file server application based on the native `net/http` module. This project was created as an exercise and should serve as a simple example of what you can build with [Go](https://go.dev/), [Docker](https://www.docker.com/) and [Kubernetes](https://kubernetes.io/).
 
 https://github.com/moatorres/infrago/assets/44585769/8109d758-6215-48a6-b888-d1c1cec94a9b
 
