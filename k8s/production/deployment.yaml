@@ -49,7 +49,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: infrago
-          image: docker.io/moatorres/infrago
+          image: docker.io/moatorres/infrago:latest
           imagePullPolicy: Always
           env:
             - name: 'PORT'
