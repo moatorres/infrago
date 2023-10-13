@@ -1,40 +1,59 @@
-TAG=""
-# TAG=$(git rev-parse --short HEAD)
+# This should match the username used on your registry
+USERNAME=moatorres
+
+# You can rename this to whatever you want
+PROJECT=infrago
+
+# TAG will be filled by the output of next command
+TAG=
+
+# Set TAG to the shorter SHA256 version of the latest commit
 $(eval TAG := $(shell git rev-parse --short HEAD))
 
+# 
+# Docker
+# 
+
 build:
-	docker buildx build -f Dockerfile . -t docker.io/moatorres/infrago:$(value TAG)
+	docker buildx build -f Dockerfile . -t ghcr.io/${USERNAME}/${PROJECT}:$(value TAG)
+	docker buildx build -f Dockerfile . -t docker.io/${USERNAME}/${PROJECT}:$(value TAG)
 
 push: 
-	docker push docker.io/moatorres/infrago:$(value TAG)
+	docker push docker.io/${USERNAME}/${PROJECT}:$(value TAG)
+	docker push ghcr.io/${USERNAME}/${PROJECT}:$(value TAG)
 
 run:
-	docker run --name infrago -it -d -p 3000:3000 moatorres/infrago:$(value TAG)
+	docker run --name ${PROJECT} -it -d -p 3000:3000 ${USERNAME}/${PROJECT}:$(value TAG)
 
 exec:
-	docker exec -t -i infrago /bin/ash
+	docker exec -t -i ${PROJECT} /bin/ash
 
 explore:
-	docker run --rm -it --entrypoint=/bin/ash infrago
+	docker run --rm -it --entrypoint=/bin/ash ${PROJECT}
 
 stop:
-	docker stop infrago
+	docker stop ${PROJECT}
 	
 remove:
-	docker remove infrago
+	docker remove ${PROJECT}
 
-deploy-prd:
-	kubectl apply -f k8s/production/deployment.yaml
-	kubectl apply -f k8s/production/ingress.yaml
+# 
+# Kubernetes
+# 
 
-cleanup-prd:
-	kubectl delete -f k8s/production/deployment.yaml
-	kubectl delete -f k8s/production/ingress.yaml
+DEV_MANIFESTS=$(wildcard k8s/dev/*.yaml)
 
 deploy-dev:
-	kubectl apply -f k8s/dev/deployment.yaml
-	kubectl apply -f k8s/dev/ingress.yaml
+	for file in $(DEV_MANIFESTS); do kubectl apply -f $$file; done
 
 cleanup-dev:
-	kubectl delete -f k8s/dev/deployment.yaml
-	kubectl delete -f k8s/dev/ingress.yaml
+	for file in $(DEV_MANIFESTS); do kubectl delete -f $$file; done
+
+PRD_MANIFESTS=$(wildcard k8s/production/*.yaml)
+
+deploy-prd:
+	for file in $(PRD_MANIFESTS); do kubectl apply -f $$file; done
+
+cleanup-prd:
+	for file in $(PRD_MANIFESTS); do kubectl delete -f $$file; done
+
