@@ -1,6 +1,6 @@
 # InfraGo
 
-### An Open-Source Static FileServer Written in Go
+### An Open-Source Static File Server Written in Go
 
 InfraGo is an open-source static file server application based on the native `net/http` module. This project was created as an exercise and should serve as a simple example of what you can build with [Go](https://go.dev/), [Docker](https://www.docker.com/) and [Kubernetes](https://kubernetes.io/).
 
@@ -36,7 +36,7 @@ make build
 
 You can deploy the resources as you'd normally do with `kubectl`.
 
-**Deploying with `kubectl`**
+**Deploying locally with `kubectl`**
 
 ```sh
 kubectl apply -f k8s/dev/deployment.yaml
@@ -68,20 +68,30 @@ sudo install skaffold /usr/local/bin/
 **Deploying with `skaffold`**
 
 ```sh
-skaffold dev
+skaffold dev -p demo
 ```
 
 ## Graceful Shutdown
 
 Let's see how our deployment behaves on Kubernetes. It's advised that you install `skaffold`. Skaffold handles the workflow for building, pushing and deploying your application, allowing you to focus on what matters most: writing code. ✨
 
-1. Open **three** terminals on your machine then run `skaffold dev` in the first one.
-2. Run `kubectl get pods` to get the names of the running pods.
-3. Now run `kubectl logs -f pods/infrago-7f5dbb59cf-dvx8g` (remember to replace the pod name with yours). This will allow us to follow our pod's logs.
+1. Open **three** terminals on your machine then run the following command in the first one.
+
+```sh
+skaffold dev -p dev
+```
+
+2. Move to the second terminal and run the following command to get the names of the running pods.
+
+```sh
+kubectl get pods
+```
+
+3. Now run `kubectl logs -f pods/infrago-7f5dbb59cf-dvx8g`. This will allow us to follow our pod's logs. Remember to replace `infrago-7f5dbb59cf-dvx8` with the name of your pod.
 4. Go to the third terminal and run `kubectl get pods infrago-7f5dbb59cf-dvx8g -w` to watch the pod's state.
 5. Now go back to the first terminal and press `ctrl c` to stop the `skaffold` process.
 
-See what happened? Since we specified a `terminationGracePeriodSeconds: 120` on our Deployment, our server was able to catch the `'terminated'` signal, wait for 10 seconds then exit the process before being shut down by Kubernetes.
+See what happened? Since we specified a `terminationGracePeriodSeconds: 120` on our Deployment, our server was able to catch the `'terminated'` signal, wait for 10 seconds, and then exit the process before being shut down by Kubernetes.
 
 ## Related Projects
 
