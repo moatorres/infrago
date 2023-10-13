@@ -2,18 +2,56 @@
 apiVersion: skaffold/v4beta6
 kind: Config
 metadata:
-  name: images
-build:
-  local:
-    push: false
-    concurrency: 3
-    useBuildkit: true
-  artifacts:
-    - image: docker.io/moatorres/infrago
-      sync:
-        infer: ['**/*']
-deploy:
-  kubectl: {}
-manifests:
-  rawYaml:
-    - k8s/dev/*.yaml
+  name: infrago
+  labels:
+    app: infrago
+profiles:
+  #
+  # Run and port-forward the application to http://127.0.0.1:3000
+  #
+  - name: demo
+    activation:
+      - env: ENV=demo
+    requiresAllActivations: false
+    portForward:
+      - resourceType: service
+        resourceName: infrago
+        namespace: default
+        port: 80
+        localPort: 3000
+    deploy:
+      kubectl: {}
+    manifests:
+      rawYaml:
+        - k8s/dev/*.yaml
+  #
+  # Deploy the application in production mode (includes Affinity and Anti-Affinity)
+  #
+  - name: production
+    activation:
+      - env: ENV=production
+    requiresAllActivations: true
+    deploy:
+      kubectl: {}
+    manifests:
+      rawYaml:
+        - k8s/production/*.yaml
+  #
+  # Build, run and watch for changes in application code
+  #
+  - name: dev
+    activation:
+      - env: ENV=development
+    requiresAllActivations: false
+    build:
+      artifacts:
+        - image: docker.io/moatorres/infrago
+          sync:
+            infer: ['go.mod', 'main.go', './modules']
+      tagPolicy:
+        sha256: {}
+    deploy:
+      kubectl: {}
+    manifests:
+      rawYaml:
+        - k8s/dev/*.yaml
