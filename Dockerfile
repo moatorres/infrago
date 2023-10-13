@@ -1,5 +1,5 @@
 # stage 1
-FROM golang:1.21.3-alpine3.18 AS base
+FROM golang:1.20-alpine AS base
 
 RUN apk add --no-cache tini
 

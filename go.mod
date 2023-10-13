@@ -1,6 +1,6 @@
 module github.com/moatorres/go
 
-go 1.21.3
+go 1.21
 
 replace modules/loggo => ./modules/logger
 
