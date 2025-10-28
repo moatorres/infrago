@@ -73,25 +73,36 @@ skaffold dev -p demo
 
 ## Graceful Shutdown
 
-Let's see how our deployment behaves on Kubernetes. It's advised that you install `skaffold`. Skaffold handles the workflow for building, pushing and deploying your application, allowing you to focus on what matters most: writing code. ✨
+Let's see how our deployment behaves on Kubernetes. It's advised that you install `skaffold`. Skaffold handles the workflow for building, pushing, and deploying your application, allowing you to focus on what matters most: writing code. ✨
 
-1. Open **three** terminals on your machine then run the following command in the first one.
+1. Open **three** terminals on your machine, then run the following command in the first one:
 
-```sh
-skaffold dev -p dev
-```
+   ```sh
+   skaffold dev -p dev
+   ```
 
-2. Move to the second terminal and run the following command to get the names of the running pods.
+2. In the second terminal, run the following command to get the names of the running pods:
 
-```sh
-kubectl get pods
-```
+   ```sh
+   kubectl get pods
+   ```
 
-3. Now run `kubectl logs -f pods/infrago-7f5dbb59cf-dvx8g`. This will allow us to follow our pod's logs. Remember to replace `infrago-7f5dbb59cf-dvx8` with the name of your pod.
-4. Go to the third terminal and run `kubectl get pods infrago-7f5dbb59cf-dvx8g -w` to watch the pod's state.
-5. Now go back to the first terminal and press `ctrl c` to stop the `skaffold` process.
+3. Follow your pod's logs by running the command below.  
+   Replace `infrago-7f5dbb59cf-dvx8g` with the actual name of your pod:
 
-See what happened? Since we specified a `terminationGracePeriodSeconds: 120` on our Deployment, our server was able to catch the `'terminated'` signal, wait for 10 seconds, and then exit the process before being shut down by Kubernetes.
+   ```sh
+   kubectl logs -f pods/infrago-7f5dbb59cf-dvx8g
+   ```
+
+4. In the third terminal, watch the pod's state with:
+
+   ```sh
+   kubectl get pods infrago-7f5dbb59cf-dvx8g -w
+   ```
+
+5. Return to the first terminal and press **Ctrl + C** to stop the `skaffold` process.
+
+See what happened? Since we specified `terminationGracePeriodSeconds: 120` in our Deployment, our server was able to catch the `'terminated'` signal, wait for 10 seconds, and then exit the process before being shut down by Kubernetes.
 
 ## Related Projects
 
